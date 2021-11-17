@@ -41,9 +41,10 @@ def upload_files():
         print(file_path)
         if (any(image_list in file_path for image_list in image_list)):
             image = Image.open(file_path)
-            image = image.resize((400, 400))
+            image = image.resize((640, 640))
             image.save(file_path)
         call(["python3", "detect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640", "--name", "output/"])
+        #call(["python3", "awsdetect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640", "--name", "output/"])
 
     return '', 204
     
