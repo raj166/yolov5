@@ -43,8 +43,8 @@ def upload_files():
             image = Image.open(file_path)
             image = image.resize((640, 640))
             image.save(file_path)
-        call(["python3", "detect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640", "--name", "output/"])
-        #call(["python3", "awsdetect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640", "--name", "output/"])
+        call(["python3", "detect.py", "--source",  file_path, "--view-img","--class", "0", "1", "2", "3", "4", "5", "6", "7", "8" , "9", "--view-img"])
+        #call(["python3", "awsdetect.py", "--source",  file_path, "--class", "0", "1", "2", "3", "4", "5", "6", "7", "8" , "9", "--view-img", "--name", "output/"])
 
     return '', 204
     
