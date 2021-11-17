@@ -43,8 +43,8 @@ def upload_files():
             image = Image.open(file_path)
             image = image.resize((400, 400))
             image.save(file_path)
-        call(["python3", "detect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640"])
-        #call(["rm", file_path])
+        call(["python3", "detect.py", "--source",  file_path, "--class", "0", "1", "--view-img", "--img-size", "640", "--name", "output/"])
+
     return '', 204
     
 
@@ -53,4 +53,4 @@ def upload(filename):
     return send_from_directory(app.config['UPLOAD_PATH'], filename)
     
 if __name__ == '__main__':  
-    app.run(debug = True, port = 6100)  
+    app.run(host = '0.0.0.0', port=5000)  
