@@ -16,7 +16,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-
+from subprocess import call
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
@@ -53,7 +53,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         augment=False,  # augmented inference
         visualize=False,  # visualize features
         update=False,  # update all models
-        project=ROOT / 'runs/detect',  # save results to project/name
+        project=ROOT / 'output',  # save results to project/name
         name='exp',  # save results to project/name
         exist_ok=False,  # existing project/name ok, do not increment
         line_thickness=3,  # bounding box thickness (pixels)
@@ -63,6 +63,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         dnn=False,  # use OpenCV DNN for ONNX inference
         ):
     source = str(source)
+    print("[INFO] Source : ", source)
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -93,7 +94,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         bs = len(dataset)  # batch_size
     else:
         dataset = LoadImages(source, img_size=imgsz, stride=stride, auto=pt and not jit)
-        bs = 1  # batch_size
+        bs = 5  # batch_size
     vid_path, vid_writer = [None] * bs, [None] * bs
 
     # Run inference
@@ -133,6 +134,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                 p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
 
             p = Path(p)  # to Path
+            print(save_dir)
             save_path = str(save_dir / p.name)  # im.jpg
             txt_path = str(save_dir / 'labels' / p.stem) + ('' if dataset.mode == 'image' else f'_{frame}')  # im.txt
             s += '%gx%g ' % im.shape[2:]  # print string
@@ -168,12 +170,35 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
 
             # Stream results
             im0 = annotator.result()
-            if view_img:
-                cv2.imshow(str(p), im0)
-                cv2.waitKey(1)  # 1 millisecond
+            # if view_img:
+            #     cv2.imshow(str(p), im0)
+            #     #cv2.waitKey(10000)  # 1 millisecond
+            #     show_image_time = 1000
+            #     while cv2.getWindowProperty(str(p), 100) >= 0:
+            #         cv2.waitKey(show_image_time)
+            #         show_image_time-=1
+            image_list= ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']
+            if (any(image_list in source for image_list in image_list)):
+                while(1):  # Will repeatedly show the image in given window.
+                    cv2.imshow(str(p), im0)
+                    k = cv2.waitKey(1) & 0xFF  # Capture the code of the pressed key.
+                    # Stop the loop when the user clicks on GUI close button [x].
+                    if not cv2.getWindowProperty(str(p), cv2.WND_PROP_VISIBLE):
+                        print("Operation Cancelled")
+                        break
+                    if k == 27:  # Key code for ESC
+                        break
+            else:
+                if view_img:
+                    im0 = cv2.resize(im0, (960, 540)) 
+                    cv2.imshow(str(p), im0)
+                    cv2.waitKey(1)  # 1 millisecond
+
+
 
             # Save results (image with detections)
             if save_img:
+                print(save_path)
                 if dataset.mode == 'image':
                     cv2.imwrite(save_path, im0)
                 else:  # 'video' or 'stream'
@@ -189,6 +214,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                             fps, w, h = 30, im0.shape[1], im0.shape[0]
                             save_path += '.mp4'
                         vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+                        print("File save at "+save_path)
                     vid_writer[i].write(im0)
 
     # Print results
@@ -199,6 +225,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
+    call(["rm", source])
 
 
 def parse_opt():
@@ -235,7 +262,7 @@ def parse_opt():
 
 
 def main(opt):
-    check_requirements(exclude=('tensorboard', 'thop'))
+    #check_requirements(exclude=('tensorboard', 'thop'))
     run(**vars(opt))
 
 
