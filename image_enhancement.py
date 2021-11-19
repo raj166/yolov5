@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jun 19 09:40:58 2020
-
-Image enhancement functions
-
-@author: Vasileios Vonikakis (bbonik@gmail.com)
-"""
-
 import math
 import imageio
 import numpy as np
@@ -16,7 +6,12 @@ from skimage.color import rgb2gray
 from skimage import img_as_float
 from skimage.exposure import rescale_intensity, adjust_gamma
 from PIL import Image 
-import PIL 
+import PIL
+import argparse
+import sys
+from pathlib import Path
+from subprocess import call
+import matplotlib
 
 
 plt.close('all')
@@ -1879,16 +1874,10 @@ def enhance_image(image, parameters, verbose=False):
 
 
 
-
-
-
 # def fuse_exposures(ls_images):
+def run(filename , output , display):
     
-
-
-if __name__=="__main__":
-    
-    filename = "./lowLigth/789.png"
+    filename = filename
     image = imageio.imread(filename)  # load image
     
     # setting up parameters
@@ -1903,28 +1892,36 @@ if __name__=="__main__":
     parameters['preserve_tones'] = True
     parameters['color_correction'] = False
     image_enhanced = enhance_image(image, parameters, verbose=False)
-    #image_enhanced.save("image_enhanced.jpg")
-    # display results
-    import matplotlib
-
-    matplotlib.image.imsave('name.png', image_enhanced)
-    print(type(image_enhanced))
-    plt.figure()
-    plt.subplot(1,2,1)
-    plt.imshow(image, vmin=0, vmax=255)
-    plt.title('Input image')
-    plt.axis('off')
-    plt.tight_layout()
-    
-    plt.subplot(1,2,2)
-    plt.imshow(image_enhanced, vmin=0, vmax=255)
-    plt.title('Enhanced image')
-    plt.axis('off')
-    plt.tight_layout()
-    
-    plt.show()
     
 
-    
-    
+    matplotlib.image.imsave(output, image_enhanced)
+    if display == 1:
+        plt.figure()
+        plt.subplot(1,2,1)
+        plt.imshow(image, vmin=0, vmax=255)
+        plt.title('Input image')
+        plt.axis('off')
+        plt.tight_layout()
+        
+        plt.subplot(1,2,2)
+        plt.imshow(image_enhanced, vmin=0, vmax=255)
+        plt.title('Enhanced image')
+        plt.axis('off')
+        plt.tight_layout()
+        
+        plt.show()
+
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    #parser.add_argument('--filename', nargs='+', type=str, default=ROOT / 'yolov5s.pt', help='model path(s)')
+    parser.add_argument('--filename', type=str, default='./data/images', help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--output', type=str, default='./data/images/name.png', help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--display', type=int, default=0 , help='0 not to display output 1 to display output')
+    opt = parser.parse_args()
+    return opt 
+
+
+if __name__ == "__main__":
+    opt = parse_opt()
+    run(**vars(opt))
     
