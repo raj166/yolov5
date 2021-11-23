@@ -140,20 +140,6 @@ def run(weights=ROOT / 'yolov5s.pt',  # model.pt path(s)
                 p, im0, frame = path, im0s.copy(), getattr(dataset, 'frame', 0)
                 new_frame_time = time.time()
  
-            # Calculating the fps
-        
-            # fps will be number of frame processed in given time frame
-            # since their will be most of time error of 0.001 second
-            # we will be subtracting it to get more accurate result
-            fps = 1/(new_frame_time-prev_frame_time)
-            prev_frame_time = new_frame_time
-        
-            # converting the fps into integer
-            fps = int(fps)
-        
-            # converting the fps to string so that we can display it on frame
-            # by using putText function
-            fps = str(fps)
             p = Path(p)  # to Path
             print(save_dir)
             save_path = str(save_dir / p.name)  # im.jpg

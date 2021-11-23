@@ -39,6 +39,8 @@ def upload_files():
         uploaded_file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
         file_path = os.path.join(app.config['UPLOAD_PATH'], filename)
         print(file_path)
+        # image = Image.open(file_path)
+        # image.save(file_path)
         if (any(image_list in file_path for image_list in image_list)):
             image = Image.open(file_path)
             image = image.resize((640, 640))
